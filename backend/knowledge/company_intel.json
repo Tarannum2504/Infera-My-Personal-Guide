@@ -1,0 +1,49 @@
+{
+  "Celebal": {
+    "readiness_weights": {"SQL": 0.25, "Python": 0.20, "Power BI": 0.20, "Azure": 0.15, "Databricks": 0.10, "Projects": 0.10},
+    "required_keywords": ["SQL", "Python", "Azure", "Databricks", "Power BI", "ADF"],
+    "preferred_keywords": ["Delta Lake", "ETL", "Medallion", "PySpark", "Synapse"],
+    "interview_rounds": ["Round 1: Aptitude+SQL (60 min)", "Round 2: Technical (45 min)", "Round 3: Azure/Databricks (30 min)", "HR Round (20 min)"],
+    "location": "Jaipur, Rajasthan",
+    "distance_from_jodhpur": "90 minutes"
+  },
+  "TCS Digital": {
+    "readiness_weights": {"SQL": 0.20, "Python": 0.25, "OOP": 0.20, "DSA": 0.15, "Azure": 0.10, "Projects": 0.10},
+    "required_keywords": ["Python", "SQL", "Cloud", "OOP", "Git"],
+    "preferred_keywords": ["Azure", "REST API", "Agile", "Data Engineering"],
+    "interview_rounds": ["NQT: Aptitude+Coding (90 min)", "Technical Interview", "HR Round"],
+    "note": "Target Digital Cadre only — NOT mass NQT batch"
+  },
+  "Optum": {
+    "readiness_weights": {"Python": 0.25, "SQL": 0.20, "Statistics": 0.20, "Power BI": 0.15, "Healthcare Domain": 0.10, "Azure": 0.10},
+    "required_keywords": ["Python", "SQL", "Analytics", "Healthcare"],
+    "preferred_keywords": ["Snowflake", "Azure", "Power BI", "Statistics", "R", "HIPAA"],
+    "interview_rounds": ["Python Coding Round", "Technical Interview", "HR Round"],
+    "note": "No Rajasthan office — requires relocation"
+  },
+  "Deloitte": {
+    "readiness_weights": {"SQL": 0.20, "Python": 0.20, "Communication": 0.25, "Projects": 0.20, "DSA": 0.15},
+    "required_keywords": ["Python", "SQL", "Analytics", "Communication"],
+    "interview_rounds": ["Aptitude", "Technical", "Case Study", "HR"],
+    "note": "Strong communication and case study skills needed"
+  },
+  "Publicis Sapient": {
+    "readiness_weights": {"Python": 0.25, "SQL": 0.20, "OOP": 0.20, "DSA": 0.20, "Projects": 0.15},
+    "required_keywords": ["Python", "SQL", "OOP", "DSA", "Git"],
+    "interview_rounds": ["Online Assessment", "Technical Round 1", "Technical Round 2", "HR"],
+    "note": "Strong DSA focus in interviews"
+  },
+  "Mediaocean": {
+    "readiness_weights": {"Python": 0.25, "SQL": 0.25, "Analytics": 0.20, "Communication": 0.15, "Projects": 0.15},
+    "required_keywords": ["Python", "SQL", "Analytics", "Media", "Data"],
+    "interview_rounds": ["Technical Assessment", "Technical Interview", "HR"],
+    "note": "Ad-tech/media domain knowledge is a plus"
+  },
+  "Data Analytics (General)": {
+    "readiness_weights": {"SQL": 0.30, "Python": 0.30, "Data Visualization": 0.20, "Statistics": 0.10, "Projects": 0.10},
+    "required_keywords": ["Python", "SQL", "Analytics", "Dashboard", "Visualization"],
+    "preferred_keywords": ["Power BI", "Tableau", "Excel", "Statistics", "Machine Learning", "ETL", "Storytelling"],
+    "interview_rounds": ["Technical Assessment", "Technical Interview", "HR"],
+    "note": "General industry standard data analytics profile."
+  }
+}

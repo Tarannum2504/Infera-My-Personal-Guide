@@ -1,0 +1,41 @@
+{
+  "Celebal": {
+    "Round 2": [
+      {"q": "Tell me about yourself", "rubric": "intro+skills+projects+why celebal"},
+      {"q": "Walk through AskQL architecture end to end", "rubric": "NLP+SQL+challenges+improvements"},
+      {"q": "Write SQL query for 3rd highest salary", "rubric": "subquery or DENSE_RANK correct"},
+      {"q": "What is Medallion Architecture?", "rubric": "Bronze raw, Silver cleaned, Gold business-ready"},
+      {"q": "Delta Lake vs regular Parquet?", "rubric": "ACID, time travel, schema evolution"},
+      {"q": "Design pipeline for daily sales data", "rubric": "ingest+transform+store+serve+schedule"},
+      {"q": "Explain window function with business example", "rubric": "PARTITION BY, business context"},
+      {"q": "ETL vs ELT - when to use each?", "rubric": "ETL=legacy, ELT=cloud/modern, tradeoffs"},
+      {"q": "Why Celebal and not TCS or Infosys?", "rubric": "Databricks MVPs+Jaipur+pure data+growth"}
+    ],
+    "Round 1 SQL": [
+      {"q": "Find duplicate emails in users table", "rubric": "GROUP BY email HAVING COUNT > 1"},
+      {"q": "Difference between RANK, DENSE_RANK, ROW_NUMBER", "rubric": "gaps vs no gaps vs always unique"},
+      {"q": "Self join to find employees earning more than manager", "rubric": "correct alias and join condition"},
+      {"q": "Write a CTE for top 3 products by sales", "rubric": "WITH clause, RANK, correct filter"},
+      {"q": "How to optimize a slow SQL query?", "rubric": "indexes, execution plan, avoid SELECT *"}
+    ]
+  },
+  "TCS": {
+    "Technical": [
+      {"q": "Explain normalization 1NF 2NF 3NF", "rubric": "atomic+partial dep+transitive dep"},
+      {"q": "ACID properties with example", "rubric": "Atomicity+Consistency+Isolation+Durability"},
+      {"q": "Polymorphism in Python with example", "rubric": "method overriding, runtime binding, code example"},
+      {"q": "Difference DELETE vs TRUNCATE vs DROP", "rubric": "rollback+where+DML vs DDL"},
+      {"q": "What is indexing? When would you NOT use it?", "rubric": "B-tree, frequently updated cols"},
+      {"q": "Write code to find second largest element", "rubric": "correct algorithm, edge cases"}
+    ]
+  },
+  "Optum": {
+    "Technical": [
+      {"q": "Build a claims validation rule engine in Python", "rubric": "age>0, amount>0, code format, date check"},
+      {"q": "What is HIPAA and how does it affect data work?", "rubric": "PHI, de-identification, access controls"},
+      {"q": "SQL: members with claims in Q1 but not Q2", "rubric": "NOT IN or NOT EXISTS subquery"},
+      {"q": "What is a claims denial rate and why does it matter?", "rubric": "formula + industry benchmark < 5%"},
+      {"q": "How to handle 30% NULL diagnosis codes?", "rubric": "understand source + business rule + document"}
+    ]
+  }
+}
