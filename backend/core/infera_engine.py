@@ -1194,10 +1194,11 @@ Respond strictly in JSON format with no markdown formatting:
     return score, feedback, explanation
 
 async def submit_quiz_answer(session_id: int, question_num: int, answer: str, user_id: int, db) -> dict:
+    from fastapi import HTTPException
     from models import QuizSession
     quiz = db.query(QuizSession).filter(QuizSession.id == session_id, QuizSession.user_id == user_id).first()
     if not quiz:
-        return {"error": "Quiz not found"}
+        raise HTTPException(status_code=404, detail="Quiz not found")
         
     questions = list(quiz.questions)
     user_answers = list(quiz.user_answers)
@@ -1205,7 +1206,10 @@ async def submit_quiz_answer(session_id: int, question_num: int, answer: str, us
     
     idx = question_num - 1
     if idx < 0 or idx >= len(questions):
-        return {"error": "Invalid question number"}
+        raise HTTPException(status_code=400, detail="Invalid question number")
+        
+    if not answer or not answer.strip():
+        raise HTTPException(status_code=400, detail="Answer cannot be empty")
         
     question_text = questions[idx]["q"]
     correct_ans = questions[idx]["answer"]
@@ -1224,6 +1228,7 @@ async def submit_quiz_answer(session_id: int, question_num: int, answer: str, us
     is_last = question_num == len(questions)
     summary = None
     next_question = None
+    quiz_review = None
     
     if is_last:
         overall = sum(scores) / len(scores)
@@ -1263,10 +1268,25 @@ async def submit_quiz_answer(session_id: int, question_num: int, answer: str, us
             
             profile.skills[topic_key] = new_skill
             
+            # Update overall placement readiness
+            if len(profile.skills) > 0:
+                avg_skill = sum(profile.skills.values()) / len(profile.skills)
+                profile.placement_readiness = int(avg_skill)
+            
             from sqlalchemy.orm.attributes import flag_modified
             flag_modified(profile, "skills")
             
             summary += f"\n\nYour {topic_key} skill has been updated to {new_skill}/100!"
+            summary += f"\nOverall Placement Readiness is now {profile.placement_readiness}/100."
+            
+        quiz_review = []
+        for i in range(len(questions)):
+            quiz_review.append({
+                "question": questions[i]["q"],
+                "correct_answer": questions[i]["answer"],
+                "user_answer": user_answers[i],
+                "score": scores[i]
+            })
                 
     else:
         next_question = questions[idx + 1]["q"]
@@ -1275,10 +1295,12 @@ async def submit_quiz_answer(session_id: int, question_num: int, answer: str, us
     
     return {
         "score": score,
+        "question_text": question_text,
         "correct_answer": correct_ans,
         "explanation": final_explanation,
         "next_question": next_question,
-        "summary": summary
+        "summary": summary,
+        "quiz_review": quiz_review
     }
 
 # ==========================================
