@@ -78,7 +78,7 @@ export default function DashboardPage() {
             <div className="bg-bgSurface border border-borderC rounded-xl p-6 shadow-sm flex flex-col justify-between">
               <div className="text-textMuted text-sm font-semibold tracking-wider mb-2">OVERALL READINESS</div>
               <div className="flex items-end justify-between">
-                <div className="text-4xl font-black text-white">72<span className="text-xl text-textMuted font-medium">/100</span></div>
+                <div className="text-4xl font-black text-white">{dashboardData?.readiness?.overall || 0}<span className="text-xl text-textMuted font-medium">/100</span></div>
                 <div className="w-12 h-12 rounded-full border-4 border-success flex items-center justify-center">
                   <TrendingUp className="text-success w-5 h-5" />
                 </div>
@@ -88,9 +88,9 @@ export default function DashboardPage() {
             <div className="bg-bgSurface border border-borderC rounded-xl p-6 shadow-sm flex flex-col justify-between">
               <div className="text-textMuted text-sm font-semibold tracking-wider mb-2">CELEBAL READINESS</div>
               <div className="flex items-end justify-between">
-                <div className="text-4xl font-black text-white">70<span className="text-xl text-textMuted font-medium">/100</span></div>
+                <div className="text-4xl font-black text-white">{dashboardData?.readiness?.celebal || 0}<span className="text-xl text-textMuted font-medium">/100</span></div>
                 <div className="flex items-center text-success font-bold text-sm bg-success/20 px-2 py-1 rounded">
-                  <ArrowUp className="w-4 h-4 mr-1" /> 5%
+                  <ArrowUp className="w-4 h-4 mr-1" /> Dynamic
                 </div>
               </div>
             </div>
@@ -98,9 +98,9 @@ export default function DashboardPage() {
             <div className="bg-bgSurface border border-borderC rounded-xl p-6 shadow-sm flex flex-col justify-between">
               <div className="text-textMuted text-sm font-semibold tracking-wider mb-2">TCS READINESS</div>
               <div className="flex items-end justify-between">
-                <div className="text-4xl font-black text-white">82<span className="text-xl text-textMuted font-medium">/100</span></div>
+                <div className="text-4xl font-black text-white">{dashboardData?.readiness?.tcs || 0}<span className="text-xl text-textMuted font-medium">/100</span></div>
                 <div className="flex items-center text-success font-bold text-sm bg-success/20 px-2 py-1 rounded">
-                  <ArrowUp className="w-4 h-4 mr-1" /> 2%
+                  <ArrowUp className="w-4 h-4 mr-1" /> Dynamic
                 </div>
               </div>
             </div>
@@ -109,9 +109,9 @@ export default function DashboardPage() {
               <div className="absolute top-0 left-0 w-1 h-full bg-danger"></div>
               <div className="text-textMuted text-sm font-semibold tracking-wider mb-2">OPTUM READINESS</div>
               <div className="flex items-end justify-between">
-                <div className="text-4xl font-black text-danger">48<span className="text-xl text-textMuted font-medium">/100</span></div>
-                <div className="flex items-center text-danger font-bold text-sm bg-danger/20 px-2 py-1 rounded">
-                  <ArrowDown className="w-4 h-4 mr-1" /> 1%
+                <div className="text-4xl font-black text-white">{dashboardData?.readiness?.optum || 0}<span className="text-xl text-textMuted font-medium">/100</span></div>
+                <div className="flex items-center text-success font-bold text-sm bg-success/20 px-2 py-1 rounded">
+                  <ArrowUp className="w-4 h-4 mr-1" /> Dynamic
                 </div>
               </div>
             </div>
@@ -219,6 +219,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
+          {/* Phase 2: Dynamic Priorities will go here.
           <div className="bg-bgSurface border border-borderC rounded-xl p-6 shadow-sm">
             <div className="flex items-center mb-6">
               <Target className="text-accent w-6 h-6 mr-3" />
@@ -226,34 +227,10 @@ export default function DashboardPage() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-bgCard border border-danger/30 rounded-lg p-5">
-                <div className="flex justify-between items-start mb-3">
-                  <span className="bg-danger/20 text-danger text-xs px-2 py-1 rounded font-bold border border-danger/30">CRITICAL PRIORITY</span>
-                  <span className="text-textMuted text-sm"><Clock className="w-4 h-4 inline mr-1" />40m</span>
-                </div>
-                <h4 className="font-bold text-white mb-2">Build Power BI Sales Dashboard</h4>
-                <p className="text-sm text-textMuted">Your Power BI score is holding you back from Optum and Celebal offers. Follow the MS Learn path and complete the primary dashboard.</p>
-              </div>
-
-              <div className="bg-bgCard border border-success/30 rounded-lg p-5">
-                <div className="flex justify-between items-start mb-3">
-                  <span className="bg-success/20 text-success text-xs px-2 py-1 rounded font-bold border border-success/30">HIGH ROI</span>
-                  <span className="text-textMuted text-sm"><Clock className="w-4 h-4 inline mr-1" />10m</span>
-                </div>
-                <h4 className="font-bold text-white mb-2">Daily SQL Practice</h4>
-                <p className="text-sm text-textMuted">Maintain your 80/100 score. Solve one medium-level JOIN or Window Function problem daily on LeetCode or HackerRank.</p>
-              </div>
-
-              <div className="bg-bgCard border border-borderC rounded-lg p-5">
-                <div className="flex justify-between items-start mb-3">
-                  <span className="bg-bgSurface text-textMuted text-xs px-2 py-1 rounded font-bold border border-borderC">MAINTENANCE</span>
-                  <span className="text-textMuted text-sm"><Clock className="w-4 h-4 inline mr-1" />10m</span>
-                </div>
-                <h4 className="font-bold text-white mb-2">Review Python Concepts</h4>
-                <p className="text-sm text-textMuted">Quickly review Object Oriented Programming concepts to ensure you are ready for technical rounds.</p>
-              </div>
+              ...
             </div>
           </div>
+          */}
 
         </div>
       </div>

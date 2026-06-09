@@ -101,6 +101,30 @@ def get_dashboard_data(
     ).fetchone()
     quiz_avg = float(quiz_avg_row[0]) if quiz_avg_row and quiz_avg_row[0] else None
 
+    # Calculate dynamic readiness
+    celebal_weights = {"SQL": 0.3, "Power BI": 0.3, "Python": 0.2, "Communication": 0.2}
+    tcs_weights = {"DBMS": 0.3, "OOP": 0.3, "DSA": 0.2, "Python": 0.2}
+    optum_weights = {"Python": 0.3, "SQL": 0.3, "Statistics": 0.2, "Azure": 0.2}
+
+    def calc_readiness(weights, user_skills):
+        score = 0
+        for skill, weight in weights.items():
+            skill_val = user_skills.get(skill, base_skills.get(skill, 30))
+            score += skill_val * weight
+        return int(score)
+
+    celebal_readiness = calc_readiness(celebal_weights, skills)
+    tcs_readiness = calc_readiness(tcs_weights, skills)
+    optum_readiness = calc_readiness(optum_weights, skills)
+    overall_readiness = int((celebal_readiness + tcs_readiness + optum_readiness) / 3)
+
+    readiness = {
+        "overall": overall_readiness,
+        "celebal": celebal_readiness,
+        "tcs": tcs_readiness,
+        "optum": optum_readiness
+    }
+
     return {
         "skills": skills,
         "mock_trend": mock_trend,
@@ -113,7 +137,8 @@ def get_dashboard_data(
         "projects": projects,
         "quiz_avg": quiz_avg,
         "has_mock_data": len(mock_trend) > 0,
-        "has_quiz_data": quiz_avg is not None
+        "has_quiz_data": quiz_avg is not None,
+        "readiness": readiness
     }
 
 from typing import List

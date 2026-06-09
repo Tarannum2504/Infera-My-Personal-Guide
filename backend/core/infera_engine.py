@@ -1180,6 +1180,35 @@ async def submit_quiz_answer(session_id: int, question_num: int, answer: str, us
         from datetime import datetime
         quiz.completed_at = datetime.utcnow()
         summary = f"Quiz Complete. Overall Score: {overall:.1f}/10"
+
+        # PHASE 1: Quiz-to-Skill Pipeline
+        # Mathematically adjust the skill based on the quiz result.
+        from models import UserProfile
+        profile = db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        if profile and profile.skills:
+            # Map topic to the exact skill key in the JSON
+            # e.g., 'python' -> 'Python'
+            topic_key = next((k for k in profile.skills.keys() if k.lower() == quiz.topic.lower()), None)
+            if topic_key:
+                current_skill = profile.skills[topic_key]
+                # Target skill is out of 100
+                target_skill = overall * 10
+                
+                # Move current skill 15% towards the target skill.
+                # If they score 100%, and they are at 50%, they gain +7.5 points.
+                # If they score 20%, and they are at 80%, they lose -9 points.
+                new_skill = current_skill + (target_skill - current_skill) * 0.15
+                
+                # Clamp between 0 and 100
+                new_skill = max(0, min(100, int(new_skill)))
+                
+                profile.skills[topic_key] = new_skill
+                
+                from sqlalchemy.orm.attributes import flag_modified
+                flag_modified(profile, "skills")
+                
+                summary += f"\n\nYour {topic_key} skill has been updated to {new_skill}/100!"
+                
     else:
         next_question = questions[idx + 1]["q"]
         

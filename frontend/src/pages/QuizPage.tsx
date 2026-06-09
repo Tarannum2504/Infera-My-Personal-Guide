@@ -16,6 +16,8 @@ export default function QuizPage() {
   
   const [lastResult, setLastResult] = useState<any>(null);
   const [isFinished, setIsFinished] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [lastUserAnswer, setLastUserAnswer] = useState('');
 
   const startQuiz = async () => {
     try {
@@ -25,6 +27,7 @@ export default function QuizPage() {
       setQuestionNum(1);
       setLastResult(null);
       setIsFinished(false);
+      setShowFeedback(false);
     } catch (e) {
       console.error(e);
     }
@@ -40,16 +43,24 @@ export default function QuizPage() {
       });
       
       setLastResult(res.data);
+      setLastUserAnswer(answer);
       setAnswer('');
+      setShowFeedback(true);
       
       if (res.data.summary) {
         setIsFinished(true);
       } else {
-        setQuestionNum(prev => prev + 1);
         setCurrentQuestion(res.data.next_question);
       }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const nextQuestion = () => {
+    setShowFeedback(false);
+    if (!isFinished) {
+      setQuestionNum(prev => prev + 1);
     }
   };
 
@@ -94,11 +105,54 @@ export default function QuizPage() {
                   START QUIZ
                 </button>
               </div>
+            ) : showFeedback ? (
+              <div className="space-y-6 bg-bgSurface p-8 rounded-lg border border-borderC shadow-xl">
+                <h2 className="text-2xl font-bold text-white mb-2">Answer Feedback</h2>
+                <div className="flex items-center gap-4 mb-6">
+                  <span className="text-3xl font-black text-accent">{lastResult.score}<span className="text-xl text-textMuted font-medium">/10</span></span>
+                  <span className="text-sm text-textMuted bg-bgCard px-3 py-1 rounded-full border border-borderC">
+                    Score
+                  </span>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="bg-danger/10 border border-danger/20 p-4 rounded-lg">
+                    <h3 className="text-sm font-bold text-danger mb-1 uppercase">Your Answer:</h3>
+                    <p className="text-white">{lastUserAnswer}</p>
+                  </div>
+                  <div className="bg-success/10 border border-success/20 p-4 rounded-lg">
+                    <h3 className="text-sm font-bold text-success mb-1 uppercase">Correct Answer:</h3>
+                    <p className="text-white">{lastResult.correct_answer}</p>
+                  </div>
+                  <div className="bg-bgCard border border-borderC p-4 rounded-lg">
+                    <h3 className="text-sm font-bold text-accent mb-1 uppercase">Explanation:</h3>
+                    <p className="text-textMuted text-sm whitespace-pre-wrap">{lastResult.explanation}</p>
+                  </div>
+                </div>
+                
+                <div className="mt-8 flex justify-end">
+                  {isFinished ? (
+                    <button 
+                      onClick={() => setShowFeedback(false)}
+                      className="bg-accent hover:bg-accent/90 text-white font-bold py-3 px-8 rounded transition-colors"
+                    >
+                      View Final Results
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={nextQuestion}
+                      className="bg-accent hover:bg-accent/90 text-white font-bold py-3 px-8 rounded transition-colors"
+                    >
+                      Next Question
+                    </button>
+                  )}
+                </div>
+              </div>
             ) : isFinished ? (
               <div className="text-center bg-bgSurface p-8 rounded-lg shadow-xl border border-borderC">
                 <CheckCircle className="w-16 h-16 text-success mx-auto mb-4" />
                 <h2 className="text-3xl font-bold mb-2">Quiz Complete</h2>
-                <p className="text-xl text-textMuted mb-6">{lastResult?.summary}</p>
+                <p className="text-xl text-textMuted mb-6 whitespace-pre-wrap">{lastResult?.summary}</p>
                 <button onClick={() => setSession(null)} className="bg-accent px-6 py-2 rounded font-bold">New Quiz</button>
               </div>
             ) : (
@@ -111,14 +165,19 @@ export default function QuizPage() {
                   {currentQuestion}
                 </h2>
                 
-                <input
-                  type="text"
+                <textarea
                   value={answer}
                   onChange={(e) => setAnswer(e.target.value)}
                   placeholder="Type your brief answer..."
-                  className="w-full bg-bgSurface border border-borderC rounded p-4 text-white focus:outline-none focus:border-accent"
-                  onKeyDown={(e) => e.key === 'Enter' && submitAnswer()}
+                  className="w-full h-32 bg-bgSurface border border-borderC rounded p-4 text-white focus:outline-none focus:border-accent resize-none"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      submitAnswer();
+                    }
+                  }}
                 />
+                <div className="text-xs text-textMuted text-right">Press Enter to submit, Shift+Enter for newline</div>
                 
                 <div className="flex justify-end">
                   <button 
@@ -129,20 +188,6 @@ export default function QuizPage() {
                     Submit Answer
                   </button>
                 </div>
-
-                {lastResult && (
-                  <div className="mt-8 bg-bgSurface p-6 rounded border border-borderC">
-                    <h3 className="font-bold text-accent mb-2">PREVIOUS ANSWER RESULT</h3>
-                    <div className="mb-4">
-                      <span className="font-bold text-white text-lg">{lastResult.score}/10 points</span>
-                    </div>
-                    <div className="bg-bgCard p-4 rounded text-sm text-textMuted">
-                      <span className="text-success font-bold">Correct Answer: </span>
-                      {lastResult.correct_answer}
-                      <p className="mt-2 text-xs">{lastResult.explanation}</p>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>
