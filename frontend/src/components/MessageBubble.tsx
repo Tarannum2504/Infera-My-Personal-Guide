@@ -98,8 +98,11 @@ function processNodes(children: React.ReactNode): React.ReactNode {
       return processText(child);
     }
     // Only drill down if it's a valid React element
-    if (React.isValidElement(child) && child.props && child.props.children) {
-      return React.cloneElement(child, child.props, processNodes(child.props.children));
+    if (React.isValidElement(child) && child.props) {
+      const props = child.props as any;
+      if (props.children) {
+        return React.cloneElement(child, props, processNodes(props.children));
+      }
     }
     return child;
   });
