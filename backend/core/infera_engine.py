@@ -56,14 +56,6 @@ async def process_message(
                     "and scored feedback after each answer.")
 
         else:
-            lang = detect_language_style(message)
-
-            if lang == "hinglish":
-                # Try direct hinglish answer first
-                hinglish_ans = build_hinglish_answer(message, user_profile)
-                if "ke baare mein zyada detail chahiye" not in hinglish_ans.lower():
-                    return hinglish_ans
-
             # General question — try HF first, then direct answer
             knowledge = get_relevant_knowledge(message)
             hf_response = await call_hf(message, user_profile, knowledge)
