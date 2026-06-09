@@ -24,6 +24,42 @@ class RenameRequest(BaseModel):
     title: str
 
 
+@router.get("/debug/memory")
+def debug_memory(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
+    
+    stored = {}
+    if profile:
+        stored = profile.memory_notes or {}
+    
+    loaded = {}
+    injected_count = 0
+    if isinstance(stored, dict):
+        loaded = stored
+        injected_count = len(stored.keys())
+    elif isinstance(stored, list):
+        import json
+        for item in stored:
+            try:
+                if isinstance(item, str):
+                    parsed = json.loads(item)
+                    if isinstance(parsed, dict):
+                        loaded.update(parsed)
+            except Exception:
+                pass
+        injected_count = len(loaded.keys())
+
+    return {
+        "user_id": current_user.id,
+        "email": current_user.email,
+        "stored_memory": stored,
+        "loaded_memory": loaded,
+        "injected_memory_count": injected_count
+    }
+
 @router.post("/send")
 async def send_message(
     message: str = Form(default=""),
