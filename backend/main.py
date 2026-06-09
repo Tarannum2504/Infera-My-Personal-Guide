@@ -11,6 +11,8 @@ app = FastAPI(title="INFERA API", version="2.0")
 
 @app.on_event("startup")
 async def startup_event():
+    from migrate_memory import migrate
+    migrate()
     from create_admin import create_admin
     await create_admin()
 
