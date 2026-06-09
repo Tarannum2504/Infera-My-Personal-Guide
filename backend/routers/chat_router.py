@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from typing import Optional
 from pydantic import BaseModel
 import traceback
+import re
 
 from database import get_db
 from models import ChatSession, ChatMessage, UserProfile, User
@@ -118,7 +119,8 @@ async def send_message(
                 "skills": profile.skills or {},
                 "target_companies": profile.target_companies or [],
                 "current_sprint_week": profile.current_sprint_week or 1,
-                "placement_readiness": profile.placement_readiness or 70
+                "placement_readiness": profile.placement_readiness or 70,
+                "memory_notes": profile.memory_notes or []
             }
 
         # Generate INFERA response
@@ -143,6 +145,22 @@ async def send_message(
             db=db,
             history=history
         )
+
+        # Extract and save new memory notes
+        memory_match = re.search(r"<MEMORY>(.*?)</MEMORY>", response_text, re.IGNORECASE | re.DOTALL)
+        if memory_match:
+            new_fact = memory_match.group(1).strip()
+            # Remove the tag from the final response
+            response_text = re.sub(r"<MEMORY>.*?</MEMORY>", "", response_text, flags=re.IGNORECASE | re.DOTALL).strip()
+            
+            # Save the fact to the user's profile
+            if profile:
+                current_notes = profile.memory_notes or []
+                if new_fact not in current_notes:
+                    current_notes.append(new_fact)
+                    # Force SQLAlchemy to detect JSON mutation
+                    profile.memory_notes = list(current_notes)
+                    db.commit()
 
         # Save INFERA response
         infera_msg = ChatMessage(

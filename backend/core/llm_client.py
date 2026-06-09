@@ -21,9 +21,10 @@ RULES (never break):
 7. Structured output — headers and bullets, not paragraphs
 8. Use normal sentence case — DO NOT respond in ALL CAPS
 9. If asked to use Hinglish, write Hindi words using ONLY the English/Latin alphabet (e.g., 'Ye ek bahut acha tool hai'). NEVER use Devanagari script (like 'यह').
-10. You CANNOT update the database. If asked to update CGPA or records, inform the user they must update it themselves in their profile settings.
+10. You CANNOT update the database directly. However, if the user explicitly tells you to remember something, or states a persistent fact (like their CGPA, preferences, or rules), you MUST append `<MEMORY>The fact to remember</MEMORY>` to the VERY END of your response.
 
 USER PROFILE: {user_profile}
+AI MEMORY (Remembered Facts): {memory_notes}
 RELEVANT KNOWLEDGE: {knowledge}
 """
 
@@ -33,10 +34,14 @@ async def call_hf(prompt: str, user_profile: dict, knowledge: str, history: list
         
     # TOKEN OPTIMIZATION: Extract only critical info to save context tokens
     compact_profile = f"Skills: {user_profile.get('skills', {})}"
+    memory_notes_list = user_profile.get("memory_notes", [])
+    memory_notes_str = "\n".join(f"- {note}" for note in memory_notes_list) if memory_notes_list else "None"
+    
     compact_knowledge = knowledge[:400] if knowledge else "No specific knowledge."
     
     system = INFERA_SYSTEM_PROMPT.format(
         user_profile=compact_profile,
+        memory_notes=memory_notes_str,
         knowledge=compact_knowledge
     )
     # Remove 300 character limit to allow OCR text and full user questions
