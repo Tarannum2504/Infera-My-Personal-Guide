@@ -61,7 +61,7 @@ async def process_message(
             knowledge = get_relevant_knowledge(message)
             hf_response = await call_hf(message, user_profile, knowledge, history=history)
 
-            if hf_response and len(hf_response.strip()) > 80:
+            if hf_response and len(hf_response.strip()) > 0:
                 hf_response = trim_response(hf_response, max_words=200)
                 return hf_response
 
