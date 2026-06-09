@@ -142,13 +142,19 @@ def detect_language_style(message: str) -> str:
 
 def trim_response(text: str, max_words: int = 250) -> str:
     """Ensure responses don't become Wikipedia articles."""
-    words = text.split()
-    if len(words) <= max_words:
+    import re
+    # Find all words (non-whitespace sequences)
+    matches = list(re.finditer(r'\S+', text))
+    if len(matches) <= max_words:
         return text
-    # Cut at a sentence boundary near the limit
-    trimmed = " ".join(words[:max_words])
+        
+    # Cut off at the start of the word that exceeds the limit
+    cutoff_index = matches[max_words].start()
+    trimmed = text[:cutoff_index].strip()
+    
+    # Try to end at a clean sentence boundary
     last_period = trimmed.rfind(".")
-    if last_period > max_words * 3:  # if period found reasonably close
+    if last_period > len(trimmed) // 2:
         return trimmed[:last_period+1]
     return trimmed + "..."
 
