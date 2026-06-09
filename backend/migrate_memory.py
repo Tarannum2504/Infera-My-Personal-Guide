@@ -19,16 +19,20 @@ def migrate():
             if "sqlite" in SQLALCHEMY_DATABASE_URL:
                 print("Running SQLite migration...")
                 # SQLite doesn't natively support JSON types in older versions, but accepts TEXT for JSON
-                conn.execute(text("ALTER TABLE user_profiles ADD COLUMN memory_notes JSON DEFAULT '[]'"))
+                conn.execute(text("ALTER TABLE user_profiles ADD COLUMN memory_notes JSON DEFAULT '{}'"))
             else:
                 print("Running PostgreSQL migration...")
                 # Postgres requires explicit casting to JSON
-                conn.execute(text("ALTER TABLE user_profiles ADD COLUMN memory_notes JSON DEFAULT '[]'::json"))
+                conn.execute(text("ALTER TABLE user_profiles ADD COLUMN memory_notes JSON DEFAULT '{}'::json"))
             
             conn.commit()
             print("Successfully added memory_notes column to user_profiles table!")
         except Exception as e:
-            print(f"Migration error (column might already exist): {e}")
+            error_msg = str(e).lower()
+            if "already exists" in error_msg or "duplicatecolumn" in error_msg:
+                print("Database schema is up to date (memory_notes column already exists).")
+            else:
+                print(f"Migration warning: {e}")
 
 if __name__ == "__main__":
     migrate()
