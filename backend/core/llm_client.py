@@ -21,12 +21,13 @@ RULES (never break):
 7. Structured output — headers and bullets, not paragraphs
 8. Use normal sentence case — DO NOT respond in ALL CAPS
 9. If asked to use Hinglish, write Hindi words using ONLY the English/Latin alphabet (e.g., 'Ye ek bahut acha tool hai'). NEVER use Devanagari script (like 'यह').
+10. You CANNOT update the database. If asked to update CGPA or records, inform the user they must update it themselves in their profile settings.
 
 USER PROFILE: {user_profile}
 RELEVANT KNOWLEDGE: {knowledge}
 """
 
-async def call_hf(prompt: str, user_profile: dict, knowledge: str) -> Optional[str]:
+async def call_hf(prompt: str, user_profile: dict, knowledge: str, history: list = None) -> Optional[str]:
     if not HF_API_KEY or HF_API_KEY.startswith("your-") or len(HF_API_KEY) < 10:
         return None
         
@@ -41,6 +42,16 @@ async def call_hf(prompt: str, user_profile: dict, knowledge: str) -> Optional[s
     # Remove 300 character limit to allow OCR text and full user questions
     full_prompt = prompt
 
+    messages = [{"role": "system", "content": system}]
+    
+    # Append conversation history
+    if history:
+        for msg in history:
+            messages.append({"role": msg["role"], "content": msg["content"]})
+            
+    # Append the current prompt
+    messages.append({"role": "user", "content": full_prompt})
+
     try:
         async with httpx.AsyncClient(timeout=120.0) as client:
             response = await client.post(
@@ -48,10 +59,7 @@ async def call_hf(prompt: str, user_profile: dict, knowledge: str) -> Optional[s
                 headers={"Authorization": f"Bearer {HF_API_KEY}"},
                 json={
                     "model": HF_MODEL,
-                    "messages": [
-                        {"role": "system", "content": system},
-                        {"role": "user", "content": full_prompt}
-                    ],
+                    "messages": messages,
                     "max_tokens": 1000,
                     "temperature": 0.7
                 }

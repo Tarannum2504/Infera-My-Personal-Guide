@@ -124,12 +124,24 @@ async def send_message(
         # Generate INFERA response
         query_type = classify(full_context)
 
+        # Fetch recent chat history for context memory
+        recent_messages = db.query(ChatMessage).filter(
+            ChatMessage.session_id == session.id,
+            ChatMessage.id != user_msg.id  # Exclude current message since it's passed separately
+        ).order_by(ChatMessage.created_at.desc()).limit(6).all()
+        
+        history = [
+            {"role": msg.role, "content": msg.content}
+            for msg in reversed(recent_messages)
+        ]
+
         response_text = await process_message(
             message=full_context,
             query_type=query_type,
             user_profile=profile_data,
             user_id=current_user.id,
-            db=db
+            db=db,
+            history=history
         )
 
         # Save INFERA response

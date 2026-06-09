@@ -10,7 +10,8 @@ async def process_message(
     query_type: str,
     user_profile: dict,
     user_id: int,
-    db: Session
+    db: Session,
+    history: list = None
 ) -> str:
     """Route message to correct handler and return response string."""
 
@@ -58,7 +59,7 @@ async def process_message(
         else:
             # General question — try HF first, then direct answer
             knowledge = get_relevant_knowledge(message)
-            hf_response = await call_hf(message, user_profile, knowledge)
+            hf_response = await call_hf(message, user_profile, knowledge, history=history)
 
             if hf_response and len(hf_response.strip()) > 80:
                 hf_response = trim_response(hf_response, max_words=200)
