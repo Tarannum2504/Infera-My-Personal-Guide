@@ -24,8 +24,15 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     
-    # Create default profile
-    new_profile = UserProfile(user_id=new_user.id)
+    # Create default profile with base skills
+    base_skills = {
+        "SQL": 80, "Python": 65, "Power BI": 20,
+        "Statistics": 40, "Azure": 15, "Databricks": 5
+    }
+    new_profile = UserProfile(
+        user_id=new_user.id,
+        skills=base_skills
+    )
     db.add(new_profile)
     db.commit()
     

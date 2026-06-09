@@ -13,6 +13,7 @@ export default function QuizPage() {
   const [answer, setAnswer] = useState('');
   const [questionNum, setQuestionNum] = useState(1);
   const [currentQuestion, setCurrentQuestion] = useState('');
+  const [nextQuestionText, setNextQuestionText] = useState('');
   
   const [lastResult, setLastResult] = useState<any>(null);
   const [isFinished, setIsFinished] = useState(false);
@@ -28,6 +29,7 @@ export default function QuizPage() {
       setLastResult(null);
       setIsFinished(false);
       setShowFeedback(false);
+      setNextQuestionText('');
     } catch (e) {
       console.error(e);
     }
@@ -50,7 +52,7 @@ export default function QuizPage() {
       if (res.data.summary) {
         setIsFinished(true);
       } else {
-        setCurrentQuestion(res.data.next_question);
+        setNextQuestionText(res.data.next_question);
       }
     } catch (e) {
       console.error(e);
@@ -60,6 +62,7 @@ export default function QuizPage() {
   const nextQuestion = () => {
     setShowFeedback(false);
     if (!isFinished) {
+      setCurrentQuestion(nextQuestionText);
       setQuestionNum(prev => prev + 1);
     }
   };
@@ -107,6 +110,12 @@ export default function QuizPage() {
               </div>
             ) : showFeedback ? (
               <div className="space-y-6 bg-bgSurface p-8 rounded-lg border border-borderC shadow-xl">
+                <div className="flex justify-between items-center text-sm font-bold text-textMuted uppercase tracking-wider mb-2">
+                  <span>Question {questionNum} of {session.total}</span>
+                </div>
+                <h2 className="text-xl font-semibold text-white leading-relaxed mb-6 pb-6 border-b border-borderC">
+                  {currentQuestion}
+                </h2>
                 <h2 className="text-2xl font-bold text-white mb-2">Answer Feedback</h2>
                 <div className="flex items-center gap-4 mb-6">
                   <span className="text-3xl font-black text-accent">{lastResult.score}<span className="text-xl text-textMuted font-medium">/10</span></span>
@@ -170,14 +179,8 @@ export default function QuizPage() {
                   onChange={(e) => setAnswer(e.target.value)}
                   placeholder="Type your brief answer..."
                   className="w-full h-32 bg-bgSurface border border-borderC rounded p-4 text-white focus:outline-none focus:border-accent resize-none"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      submitAnswer();
-                    }
-                  }}
                 />
-                <div className="text-xs text-textMuted text-right">Press Enter to submit, Shift+Enter for newline</div>
+                <div className="text-xs text-textMuted text-right">Click Submit Answer when done</div>
                 
                 <div className="flex justify-end">
                   <button 

@@ -983,55 +983,112 @@ def score_answer(question: dict, answer: str) -> tuple[float, str, str]:
 # ==========================================
 
 QUIZ_QUESTIONS = {
-  "SQL": [
-    {"q": "What is the difference between RANK() and DENSE_RANK()?",
-     "answer": "RANK() leaves gaps after ties (1,1,3), DENSE_RANK() does not (1,1,2)",
-     "topic": "window_functions"},
-    {"q": "Write a query to find all employees who earn more than the average salary",
-     "answer": "SELECT * FROM employees WHERE salary > (SELECT AVG(salary) FROM employees)",
-     "topic": "subqueries"},
-    {"q": "What does PARTITION BY do in a window function?",
-     "answer": "Divides the result set into partitions for the window function to work on independently",
-     "topic": "window_functions"},
-    {"q": "Difference between WHERE and HAVING?",
-     "answer": "WHERE filters before aggregation, HAVING filters after. Cannot use aggregates in WHERE",
-     "topic": "aggregation"},
-    {"q": "What is a CTE and when would you use it?",
-     "answer": "Common Table Expression using WITH clause. Use for readability, recursion, or reusing a subquery",
-     "topic": "advanced_sql"},
-    {"q": "Write a self-join to find employees who earn more than their manager",
-     "answer": "SELECT e.name FROM employees e JOIN employees m ON e.manager_id = m.id WHERE e.salary > m.salary",
-     "topic": "joins"},
-    {"q": "What is the difference between INNER JOIN and LEFT JOIN?",
-     "answer": "INNER: only matching rows. LEFT: all left rows + matching right rows (NULLs where no match)",
-     "topic": "joins"},
-    {"q": "How do you find duplicate records in a table?",
-     "answer": "SELECT email, COUNT(*) FROM users GROUP BY email HAVING COUNT(*) > 1",
-     "topic": "aggregation"},
-    {"q": "What is an index and when should you NOT use one?",
-     "answer": "Index speeds up reads. Avoid on frequently updated columns, small tables, or low-cardinality columns",
-     "topic": "optimization"},
-    {"q": "Explain LEAD() and LAG() window functions with a use case",
-     "answer": "LEAD gets next row value, LAG gets previous. Use case: compare today's sales to yesterday's",
-     "topic": "window_functions"}
-  ],
-  "Python": [
-    {"q": "What is the difference between a list and a tuple in Python?",
-     "answer": "List is mutable, tuple is immutable. Tuples are faster and used for fixed data",
-     "topic": "data_structures"},
-    {"q": "What is a generator in Python? When do you use it?",
-     "answer": "Uses yield, generates values lazily. Use for large datasets to save memory",
-     "topic": "advanced"},
-    {"q": "How do you handle missing values in a Pandas DataFrame?",
-     "answer": "dropna() to remove, fillna(value) to fill, interpolate() for time series. Check first with isnull().sum()",
-     "topic": "pandas"},
-    {"q": "What is the difference between deepcopy and shallowcopy?",
-     "answer": "Shallow copies reference same nested objects. Deep copy creates completely independent copies",
-     "topic": "advanced"},
-    {"q": "Write a function to find duplicates in a list",
-     "answer": "Use a set: seen=set(); return [x for x in lst if x in seen or seen.add(x)]",
-     "topic": "basics"}
-  ]
+    "SQL": [
+      {"q": "What is the difference between RANK() and DENSE_RANK()?",
+       "answer": "RANK() leaves gaps after ties (1,1,3), DENSE_RANK() does not (1,1,2)",
+       "topic": "window_functions"},
+      {"q": "Write a query to find all employees who earn more than the average salary",
+       "answer": "SELECT * FROM employees WHERE salary > (SELECT AVG(salary) FROM employees)",
+       "topic": "subqueries"},
+      {"q": "What does PARTITION BY do in a window function?",
+       "answer": "Divides the result set into partitions for the window function to work on independently",
+       "topic": "window_functions"},
+      {"q": "Difference between WHERE and HAVING?",
+       "answer": "WHERE filters before aggregation, HAVING filters after. Cannot use aggregates in WHERE",
+       "topic": "aggregation"},
+      {"q": "What is a CTE and when would you use it?",
+       "answer": "Common Table Expression using WITH clause. Use for readability, recursion, or reusing a subquery",
+       "topic": "advanced_sql"},
+      {"q": "Write a self-join to find employees who earn more than their manager",
+       "answer": "SELECT e.name FROM employees e JOIN employees m ON e.manager_id = m.id WHERE e.salary > m.salary",
+       "topic": "joins"},
+      {"q": "What is the difference between INNER JOIN and LEFT JOIN?",
+       "answer": "INNER JOIN returns only matching rows. LEFT JOIN returns all rows from the left table and matched rows from the right table, or NULL if no match.",
+       "topic": "joins"},
+      {"q": "How does GROUP BY behave when combined with aggregate functions?",
+       "answer": "GROUP BY groups rows that have the same values into summary rows. Aggregate functions calculate a single value for each grouped set.",
+       "topic": "aggregation"},
+      {"q": "Explain the difference between UNION and UNION ALL.",
+       "answer": "UNION combines the result sets of two queries and removes duplicates. UNION ALL combines them but keeps duplicates.",
+       "topic": "set_operations"},
+      {"q": "What is the purpose of the COALESCE function?",
+       "answer": "COALESCE returns the first non-null value in a list of arguments. Useful for replacing NULLs with default values.",
+       "topic": "functions"},
+      {"q": "What is a clustered vs non-clustered index?",
+       "answer": "Clustered index determines the physical order of data in a table (one per table). Non-clustered index stores pointers to the data (multiple per table).",
+       "topic": "performance"},
+      {"q": "How can you optimize a slow-running SQL query?",
+       "answer": "Use indexes, avoid SELECT *, filter early with WHERE, analyze query execution plans, and minimize subqueries or joins on unindexed columns.",
+       "topic": "optimization"},
+      {"q": "What are ACID properties in database transactions?",
+       "answer": "Atomicity (all or nothing), Consistency (valid state), Isolation (concurrent execution is safe), Durability (saved permanently).",
+       "topic": "transactions"},
+      {"q": "What is the difference between DELETE, TRUNCATE, and DROP?",
+       "answer": "DELETE removes specific rows (logged). TRUNCATE removes all rows quickly (not fully logged). DROP removes the entire table structure.",
+       "topic": "ddl_dml"},
+      {"q": "Write a query to find the second highest salary in an employee table.",
+       "answer": "SELECT MAX(salary) FROM employees WHERE salary < (SELECT MAX(salary) FROM employees) OR use DENSE_RANK() == 2.",
+       "topic": "queries"},
+      {"q": "What is an inner query vs a correlated subquery?",
+       "answer": "An inner query executes once independently. A correlated subquery executes once for every row returned by the outer query, using its values.",
+       "topic": "subqueries"}
+    ],
+    "Python": [
+      {"q": "What is a decorator in Python?",
+       "answer": "A function that takes another function and extends its behavior without explicitly modifying it.",
+       "topic": "functions"},
+      {"q": "Difference between list and tuple?",
+       "answer": "Lists are mutable, tuples are immutable.",
+       "topic": "data_structures"},
+      {"q": "What does the yield keyword do?",
+       "answer": "Turns a function into a generator, pausing execution and returning a value, retaining state for the next call.",
+       "topic": "generators"},
+      {"q": "How is memory managed in Python?",
+       "answer": "Python uses reference counting and a cycle-detecting garbage collector.",
+       "topic": "internals"},
+      {"q": "What are *args and **kwargs?",
+       "answer": "Used to pass a variable number of positional arguments (*args) or keyword arguments (**kwargs) to a function.",
+       "topic": "functions"},
+      {"q": "What is the Global Interpreter Lock (GIL)?",
+       "answer": "A mutex in CPython that ensures only one thread executes Python bytecode at a time, limiting multi-threading performance.",
+       "topic": "internals"},
+      {"q": "Explain the difference between deepcopy and shallow copy.",
+       "answer": "A shallow copy creates a new object but inserts references into it. A deep copy recursively copies all objects found in the original.",
+       "topic": "data_structures"},
+      {"q": "What are list comprehensions and why use them?",
+       "answer": "A concise way to create lists using brackets. They are usually faster and more readable than loops.",
+       "topic": "syntax"},
+      {"q": "What is the difference between __str__ and __repr__?",
+       "answer": "__str__ is for readable string representation for end users. __repr__ is for unambiguous representation for developers/debugging.",
+       "topic": "oop"},
+      {"q": "How do you handle exceptions in Python?",
+       "answer": "Using try, except, else, and finally blocks to catch and manage errors gracefully.",
+       "topic": "error_handling"},
+      {"q": "What is a lambda function?",
+       "answer": "A small, anonymous, single-expression function defined using the lambda keyword.",
+       "topic": "functions"},
+      {"q": "Explain the concept of duck typing in Python.",
+       "answer": "If it walks like a duck and quacks like a duck, it's a duck. Focuses on object behavior rather than explicit type or class inheritance.",
+       "topic": "oop"},
+      {"q": "What is the difference between == and 'is' in Python?",
+       "answer": "== checks for value equality. 'is' checks for identity (if both variables point to the same object in memory).",
+       "topic": "operators"},
+      {"q": "What are Python context managers?",
+       "answer": "Objects that manage resources (like files) using the 'with' statement, ensuring setup and teardown (like closing files) are handled automatically.",
+       "topic": "syntax"},
+      {"q": "How does dictionary implementation work in Python?",
+       "answer": "Dictionaries are implemented using hash tables, allowing O(1) average time complexity for lookups.",
+       "topic": "data_structures"},
+      {"q": "What is the purpose of the map() and filter() functions?",
+       "answer": "map() applies a function to all items in an iterable. filter() returns items from an iterable for which a function returns True.",
+       "topic": "functions"},
+      {"q": "What are Python metaclasses?",
+       "answer": "Metaclasses are 'classes of a class'. They define how a class behaves. A class is an instance of a metaclass.",
+       "topic": "oop"},
+      {"q": "Explain the difference between classmethods and staticmethods.",
+       "answer": "Classmethods take 'cls' as the first argument and can access class state. Staticmethods take no implicit first argument and act like regular functions bound to the class namespace.",
+       "topic": "oop"}
+    ]
 }
 
 def start_quiz(topic: str, user_id: int, db) -> dict:
@@ -1059,86 +1116,81 @@ def start_quiz(topic: str, user_id: int, db) -> dict:
         "total": q_count
     }
 
-def score_quiz_answer(
+async def score_quiz_answer(
     question: dict, 
     user_answer: str
 ) -> tuple[int, str, str]:
     """
     Returns (score_0_to_10, feedback, correct_answer_explanation)
-    Uses conceptual matching not exact matching.
+    Uses LLM for strict and accurate conceptual matching.
     """
     if not user_answer or len(user_answer.strip()) < 3:
         return 0, "No answer provided.", question.get('answer', '')
     
-    correct = question.get('answer', '').lower()
-    user = user_answer.lower().strip()
-    topic = question.get('topic', '')
+    from core.llm_client import HF_API_KEY, HF_MODEL, HF_URL
+    import json
+    import httpx
     
-    # Extract key concepts from correct answer
-    # Split by common delimiters and get meaningful words
-    stop_words = {'the','a','an','is','are','was','were','be',
-                  'to','of','in','on','at','by','for','with',
-                  'has','have','had','do','does','did','will',
-                  'would','could','should','may','might','must',
-                  'and','or','but','not','no','it','its','this',
-                  'that','they','them','their','from','into','than'}
-    
-    correct_concepts = set(
-        w for w in correct.replace(',','').replace('.','')
-                         .replace('(','').replace(')','').split()
-        if len(w) > 3 and w not in stop_words
-    )
-    
-    user_concepts = set(
-        w for w in user.replace(',','').replace('.','')
-                       .replace('(','').replace(')','').split()
-        if len(w) > 3 and w not in stop_words
-    )
-    
-    # Partial matching (user word starts with correct word or vice versa)
-    matches = 0
-    for uw in user_concepts:
-        for cw in correct_concepts:
-            if (uw == cw or uw.startswith(cw[:4]) or 
-                cw.startswith(uw[:4])):
-                matches += 1
-                break
-    
-    # Calculate match ratio
-    if len(correct_concepts) == 0:
-        concept_score = 5  # can't evaluate, give middle score
-    else:
-        match_ratio = matches / len(correct_concepts)
-        concept_score = int(match_ratio * 8)  # max 8 from concepts
-    
-    # Bonus points
-    bonus = 0
-    if len(user_answer) > 80:  bonus += 1  # detailed answer
-    if len(user_answer) > 150: bonus += 1  # very detailed
-    
-    score = min(10, concept_score + bonus)
-    score = max(1, score)  # minimum 1 for attempting
-    
-    # Generate feedback
-    if score >= 8:
-        feedback = (f"Excellent! ({score}/10) Your answer covers "
-                   f"the key concepts well.")
-    elif score >= 6:
-        feedback = (f"Good answer ({score}/10). You got the main idea. "
-                   f"To score 9+, be more specific with examples.")
-    elif score >= 4:
-        feedback = (f"Partial credit ({score}/10). You're on the right "
-                   f"track but missing key details.")
-    elif score >= 2:
-        feedback = (f"Needs work ({score}/10). You touched on the topic "
-                   f"but the core answer is different.")
-    else:
-        feedback = f"Incorrect ({score}/10). Study this concept."
-    
-    # Always show the correct answer for learning
-    explanation = (f"Correct Answer: {question.get('answer', 'N/A')}\n"
-                  f"Key concepts: {', '.join(list(correct_concepts)[:5])}")
-    
+    prompt = f"""You are a strict technical interviewer grading a quiz.
+Topic: {question.get('topic', 'Technical')}
+Question: {question.get('q', '')}
+Correct Answer Concept: {question.get('answer', '')}
+User's Answer: {user_answer}
+
+Evaluate the user's answer against the correct answer concept.
+Provide a score from 0 to 10. 
+- 10: Perfect or completely captures the concept.
+- 7-9: Good, but missing minor details.
+- 4-6: Partial credit, somewhat on track.
+- 1-3: Poor, mostly incorrect but mentions related terms.
+- 0: Completely wrong, irrelevant, or garbage input (like 'idk', 'dunno', random letters).
+
+Respond strictly in JSON format with no markdown formatting:
+{{
+  "score": <integer 0-10>,
+  "feedback": "<1-2 sentence feedback directly addressing the user's answer>"
+}}"""
+
+    try:
+        if not HF_API_KEY or len(HF_API_KEY) < 10:
+            raise ValueError("HF_API_KEY is not configured properly.")
+            
+        async with httpx.AsyncClient() as client:
+            headers = {
+                "Authorization": f"Bearer {HF_API_KEY}",
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "model": HF_MODEL,
+                "messages": [{"role": "user", "content": prompt}],
+                "max_tokens": 150,
+                "temperature": 0.1
+            }
+            resp = await client.post(HF_URL, json=payload, headers=headers, timeout=10.0)
+            resp.raise_for_status()
+            data = resp.json()
+            text = data["choices"][0]["message"]["content"].strip()
+            
+        if text.startswith("```json"):
+            text = text[7:]
+        if text.startswith("```"):
+            text = text[3:]
+        if text.endswith("```"):
+            text = text[:-3]
+            
+        result = json.loads(text.strip())
+        score = int(result.get("score", 0))
+        feedback = result.get("feedback", "No feedback provided.")
+        
+        # Clamp score between 0 and 10
+        score = max(0, min(10, score))
+        
+    except Exception as e:
+        print(f"Quiz scoring LLM error: {e}. Falling back to default.")
+        score = 0
+        feedback = "Error analyzing answer. Scored 0 by default."
+        
+    explanation = f"Correct Answer: {question.get('answer', 'N/A')}"
     return score, feedback, explanation
 
 async def submit_quiz_answer(session_id: int, question_num: int, answer: str, user_id: int, db) -> dict:
@@ -1158,7 +1210,7 @@ async def submit_quiz_answer(session_id: int, question_num: int, answer: str, us
     question_text = questions[idx]["q"]
     correct_ans = questions[idx]["answer"]
     
-    score, feedback, explanation = score_quiz_answer(questions[idx], answer)
+    score, feedback, explanation = await score_quiz_answer(questions[idx], answer)
     
     # Return both feedback and explanation together so the frontend displays it
     final_explanation = f"{feedback}\n\n{explanation}"
@@ -1185,29 +1237,36 @@ async def submit_quiz_answer(session_id: int, question_num: int, answer: str, us
         # Mathematically adjust the skill based on the quiz result.
         from models import UserProfile
         profile = db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
-        if profile and profile.skills:
+        if profile:
+            if not profile.skills:
+                profile.skills = {}
+                
             # Map topic to the exact skill key in the JSON
             # e.g., 'python' -> 'Python'
             topic_key = next((k for k in profile.skills.keys() if k.lower() == quiz.topic.lower()), None)
-            if topic_key:
-                current_skill = profile.skills[topic_key]
-                # Target skill is out of 100
-                target_skill = overall * 10
+            
+            # If the skill hasn't been tracked yet, initialize it
+            if not topic_key:
+                # Title case the topic name (e.g., "SQL", "Python")
+                topic_key = "SQL" if quiz.topic.lower() == "sql" else quiz.topic.title()
+                profile.skills[topic_key] = 30 # Default starting skill if totally unknown
                 
-                # Move current skill 15% towards the target skill.
-                # If they score 100%, and they are at 50%, they gain +7.5 points.
-                # If they score 20%, and they are at 80%, they lose -9 points.
-                new_skill = current_skill + (target_skill - current_skill) * 0.15
-                
-                # Clamp between 0 and 100
-                new_skill = max(0, min(100, int(new_skill)))
-                
-                profile.skills[topic_key] = new_skill
-                
-                from sqlalchemy.orm.attributes import flag_modified
-                flag_modified(profile, "skills")
-                
-                summary += f"\n\nYour {topic_key} skill has been updated to {new_skill}/100!"
+            current_skill = profile.skills[topic_key]
+            # Target skill is out of 100
+            target_skill = overall * 10
+            
+            # Move current skill 15% towards the target skill.
+            new_skill = current_skill + (target_skill - current_skill) * 0.15
+            
+            # Clamp between 0 and 100
+            new_skill = max(0, min(100, int(new_skill)))
+            
+            profile.skills[topic_key] = new_skill
+            
+            from sqlalchemy.orm.attributes import flag_modified
+            flag_modified(profile, "skills")
+            
+            summary += f"\n\nYour {topic_key} skill has been updated to {new_skill}/100!"
                 
     else:
         next_question = questions[idx + 1]["q"]
