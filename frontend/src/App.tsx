@@ -6,6 +6,7 @@ import InterviewPage from './pages/InterviewPage';
 import InterviewHistoryPage from './pages/InterviewHistoryPage';
 import QuizPage from './pages/QuizPage';
 import ResumePage from './pages/ResumePage';
+import MemoryDebugPage from './pages/MemoryDebugPage';
 import { useAuth } from './context/AuthContext';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
         <Route path="/interview/history" element={isAuthenticated ? <InterviewHistoryPage /> : <Navigate to="/login" />} />
         <Route path="/quiz" element={isAuthenticated ? <QuizPage /> : <Navigate to="/login" />} />
         <Route path="/resume" element={isAuthenticated ? <ResumePage /> : <Navigate to="/login" />} />
+        <Route path="/memory-debug" element={isAuthenticated ? <MemoryDebugPage /> : <Navigate to="/login" />} />
         
         <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
       </Routes>

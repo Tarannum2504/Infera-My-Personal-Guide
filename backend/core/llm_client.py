@@ -21,10 +21,13 @@ RULES (never break):
 7. Structured output — headers and bullets, not paragraphs
 8. Use normal sentence case — DO NOT respond in ALL CAPS
 9. If asked to use Hinglish, write Hindi words using ONLY the English/Latin alphabet (e.g., 'Ye ek bahut acha tool hai'). NEVER use Devanagari script (like 'यह').
-10. You CANNOT update the database directly. However, if the user explicitly tells you to remember something, or states a persistent fact (like their CGPA, preferences, or rules), you MUST append `<MEMORY>The fact to remember</MEMORY>` to the VERY END of your response.
+10. You CANNOT update the database directly. However, if the user explicitly tells you to remember something, or states a persistent fact (like their CGPA, preferences, or rules), you MUST output a raw JSON dictionary inside a `<MEMORY>` tag at the VERY END of your response. Example: `<MEMORY>{"cgpa": "9.7", "internship_company": "SIN Education"}</MEMORY>`.
+11. When user asks about their own profile (e.g. CGPA, internship, projects, etc.), only answer using stored memory or database facts. If information is unavailable, explicitly state: "I don't have verified information about your [fact]." Never invent, infer, or assume personal facts. Prefix memory-based answers with "Source: Memory Database".
 
 USER PROFILE: {user_profile}
-AI MEMORY (Remembered Facts): {memory_notes}
+AI MEMORY (Structured JSON Facts):
+{memory_notes}
+
 RELEVANT KNOWLEDGE: {knowledge}
 """
 
@@ -34,8 +37,19 @@ async def call_hf(prompt: str, user_profile: dict, knowledge: str, history: list
         
     # TOKEN OPTIMIZATION: Extract only critical info to save context tokens
     compact_profile = f"Skills: {user_profile.get('skills', {})}"
-    memory_notes_list = user_profile.get("memory_notes", [])
-    memory_notes_str = "\n".join(f"- {note}" for note in memory_notes_list) if memory_notes_list else "None"
+    
+    # memory_notes is now a dict
+    memory_notes_dict = user_profile.get("memory_notes", {})
+    if isinstance(memory_notes_dict, list):
+        # Fallback if unmigrated
+        memory_notes_str = "\n".join(f"- {note}" for note in memory_notes_dict) if memory_notes_dict else "None"
+        num_items = len(memory_notes_dict)
+    else:
+        memory_notes_str = "\n".join(f"- {k}: {v}" for k, v in memory_notes_dict.items()) if memory_notes_dict else "None"
+        num_items = len(memory_notes_dict.keys())
+    
+    print(f"[MEMORY DEBUG]\nRetrieved:\n{memory_notes_dict}")
+    print(f"[MEMORY DEBUG]\nInjecting {num_items} memory item into prompt.")
     
     compact_knowledge = knowledge[:400] if knowledge else "No specific knowledge."
     

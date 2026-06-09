@@ -11,6 +11,12 @@ app = FastAPI(title="INFERA API", version="2.0")
 
 @app.on_event("startup")
 async def startup_event():
+    import os
+    commit_hash = os.environ.get("RENDER_GIT_COMMIT", "local-dev")
+    print(f"\n[MEMORY SYSTEM ENABLED]")
+    print(f"Version: {commit_hash}")
+    print(f"Memory Module Loaded: TRUE\n")
+    
     from migrate_memory import migrate
     migrate()
     from create_admin import create_admin

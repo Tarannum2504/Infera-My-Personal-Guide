@@ -137,6 +137,34 @@ async def send_message(
             for msg in reversed(recent_messages)
         ]
 
+        # Intercept /show-memory
+        if full_context.strip() == "/show-memory":
+            import json
+            current_notes = profile.memory_notes or {}
+            
+            # Automatic Migration for display
+            if isinstance(current_notes, list):
+                migrated_notes = {}
+                for item in current_notes:
+                    try:
+                        if isinstance(item, str):
+                            parsed = json.loads(item)
+                            if isinstance(parsed, dict):
+                                migrated_notes.update(parsed)
+                    except Exception:
+                        pass
+                current_notes = migrated_notes
+                
+            mem_str = "\n".join([f"{k.replace('_', ' ').title()}:\n{v}\n" for k, v in current_notes.items()])
+            response_text = f"Current Stored Memory\n\n{mem_str}" if mem_str else "Current Stored Memory\n\nNone"
+            
+            return JSONResponse({
+                "response": response_text,
+                "session_id": session.id,
+                "session_title": session.title,
+                "message_id": 999999
+            })
+
         response_text = await process_message(
             message=full_context,
             query_type=query_type,
@@ -147,20 +175,46 @@ async def send_message(
         )
 
         # Extract and save new memory notes
+        print(f"[MEMORY DEBUG]\nChecking AI response for <MEMORY> tag...")
         memory_match = re.search(r"<MEMORY>(.*?)</MEMORY>", response_text, re.IGNORECASE | re.DOTALL)
         if memory_match:
-            new_fact = memory_match.group(1).strip()
+            raw_json = memory_match.group(1).strip()
+            print(f"[MEMORY DEBUG]\nExtracted:\n{raw_json}")
+            
             # Remove the tag from the final response
             response_text = re.sub(r"<MEMORY>.*?</MEMORY>", "", response_text, flags=re.IGNORECASE | re.DOTALL).strip()
             
-            # Save the fact to the user's profile
             if profile:
-                current_notes = profile.memory_notes or []
-                if new_fact not in current_notes:
-                    current_notes.append(new_fact)
-                    # Force SQLAlchemy to detect JSON mutation
-                    profile.memory_notes = list(current_notes)
-                    db.commit()
+                import json
+                current_notes = profile.memory_notes or {}
+                
+                # Automatic Migration
+                if isinstance(current_notes, list):
+                    migrated_notes = {}
+                    for item in current_notes:
+                        try:
+                            if isinstance(item, str):
+                                parsed = json.loads(item)
+                                if isinstance(parsed, dict):
+                                    migrated_notes.update(parsed)
+                        except Exception:
+                            pass
+                    current_notes = migrated_notes
+
+                try:
+                    new_facts = json.loads(raw_json)
+                    if isinstance(new_facts, dict):
+                        current_notes.update(new_facts)
+                        
+                        from sqlalchemy.orm.attributes import flag_modified
+                        profile.memory_notes = current_notes
+                        flag_modified(profile, "memory_notes")
+                        db.commit()
+                        print(f"[MEMORY DEBUG]\nSaving:\n{json.dumps(new_facts, indent=2)}")
+                except json.JSONDecodeError:
+                    print(f"[MEMORY DEBUG]\nFailed to parse JSON memory: {raw_json}")
+        else:
+            print(f"[MEMORY DEBUG]\nNo <MEMORY> tag found in AI response.")
 
         # Save INFERA response
         infera_msg = ChatMessage(
