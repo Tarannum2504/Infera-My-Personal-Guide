@@ -47,7 +47,8 @@ async def call_hf(prompt: str, user_profile: dict, knowledge: str, history: list
     # Append conversation history
     if history:
         for msg in history:
-            messages.append({"role": msg["role"], "content": msg["content"]})
+            role = "assistant" if msg["role"] == "infera" else msg["role"]
+            messages.append({"role": role, "content": msg["content"]})
             
     # Append the current prompt
     messages.append({"role": "user", "content": full_prompt})
