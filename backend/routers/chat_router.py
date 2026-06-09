@@ -202,17 +202,28 @@ async def send_message(
                     current_notes = migrated_notes
 
                 try:
-                    new_facts = json.loads(raw_json)
+                    # Strip potential markdown formatting from AI output
+                    clean_json = raw_json.strip()
+                    if clean_json.startswith("```json"):
+                        clean_json = clean_json[7:]
+                    elif clean_json.startswith("```"):
+                        clean_json = clean_json[3:]
+                    if clean_json.endswith("```"):
+                        clean_json = clean_json[:-3]
+                    clean_json = clean_json.strip()
+
+                    new_facts = json.loads(clean_json)
                     if isinstance(new_facts, dict):
                         current_notes.update(new_facts)
                         
                         from sqlalchemy.orm.attributes import flag_modified
-                        profile.memory_notes = current_notes
+                        # Reassign as a completely new dictionary to ensure SQLAlchemy detects the change
+                        profile.memory_notes = dict(current_notes)
                         flag_modified(profile, "memory_notes")
                         db.commit()
                         print(f"[MEMORY DEBUG]\nSaving:\n{json.dumps(new_facts, indent=2)}")
-                except json.JSONDecodeError:
-                    print(f"[MEMORY DEBUG]\nFailed to parse JSON memory: {raw_json}")
+                except json.JSONDecodeError as e:
+                    print(f"[MEMORY DEBUG]\nFailed to parse JSON memory: {raw_json}\nError: {e}")
         else:
             print(f"[MEMORY DEBUG]\nNo <MEMORY> tag found in AI response.")
 
